@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('DOCKER_HUB_CREDENTIALS')
         IMAGE_NAME = 'fuzdocker/test'
         DOCKER_PATH = '/usr/local/bin/docker'
     }
@@ -11,21 +10,17 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    // Build the Docker image
                     sh "${DOCKER_PATH} build -t ${IMAGE_NAME}:latest -f Dockerfile ."
                 }
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    // Retrieve Docker Hub credentials
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
-                        // Log in to Docker Hub using --password-stdin
-                        sh "echo ${DOCKER_HUB_PASSWORD} | ${DOCKER_PATH} login -u ${DOCKER_HUB_USERNAME} --password-stdin"
-                        // Push the Docker image to Docker Hub
-                        sh "${DOCKER_PATH} push ${IMAGE_NAME}:latest"
-                    }
+                    // Run the Docker container
+                    sh "${DOCKER_PATH} run -d -p 3000:3000 ${IMAGE_NAME}:latest"
                 }
             }
         }
