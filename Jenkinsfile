@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'fuzdocker/test'
         DOCKER_PATH = '/usr/local/bin/docker'
+        CONTAINER_NAME = 'test' // Change this to your desired container name
     }
 
     stages {
@@ -19,8 +20,8 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    // Run the Docker container
-                    sh "${DOCKER_PATH} run -d -p 3000:3000 ${IMAGE_NAME}:latest"
+                    // Run the Docker container with a custom name
+                    sh "${DOCKER_PATH} run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
                 }
             }
         }
